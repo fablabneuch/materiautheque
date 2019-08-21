@@ -83,12 +83,28 @@
             toggleVal += 1;
 	          toggleVal %= 2;
 	      iosocket.emit('buttonval',toggleVal);
-	 });
+	     });
+       $('#setLED').click(function() {
+           var num = $('#numLED').val();
+           var red = $('#RED').val();
+           var green = $('#GREEN').val();
+           var blue = $('#BLUE').val();
+           var brightness = $('#brightness').val();
+           var setVal = num + '/' + red + '/' + green + '/' + blue + '/' + brightness + '/';
+           iosocket.emit('setLED',setVal);
+      });
 	});
     </script>
   </head>
   <body>
-
+  <div>
+    LED n°: <input type="text" id="numLED"><br />
+    RED: <input type="text" id="RED"><br />
+    GREEN: <input type="text" id="GREEN"><br />
+    BLUE: <input type="text" id="BLUE"><br />
+    Brightness: <input type="text" id="brightness"><br />
+    <button type="button" id="setLED">GO!</button>
+  </div>
   <div id="sData">
   	<h2>Data to Arduino</h2>
   	<div id="btnHolder">

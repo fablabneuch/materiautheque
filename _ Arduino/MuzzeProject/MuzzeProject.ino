@@ -14,6 +14,7 @@ CRGB leds[NUM_LEDS];
 String inputString = "";         // a string to hold incoming data
 boolean toggleComplete = false;  // whether the string is complete
 boolean pwmComplete = false;
+boolean setledComplete = false;
 int i;
 
 void setup() {
@@ -35,6 +36,9 @@ void loop() {
     }
     if(inChar == 'P'){// end character for dim LED
       pwmComplete = true;
+    }
+    if(inChar == 'O'){// end character for dim LED
+      setledComplete = true;
     }
     else{
       inputString += inChar;
@@ -79,6 +83,14 @@ void loop() {
     // convert String to int
     int recievedVal = stringToInt();
     FastLED.setBrightness(constrain(recievedVal, MIN_BRIGHTNESS, MAX_BRIGHTNESS));
+    pwmComplete = false;
+  }
+  if(!Serial.available() && setledComplete == true){
+    // convert String to int
+    var recievedValTab = strtok(inputString, '/');
+    inputString = "";
+    leds[recievedValTab[0]] = CRGB(recievedValTab[1],recievedValTab[2],recievedValTab[3]);
+    FastLED.setBrightness(constrain(recievedValTab[4]);
     pwmComplete = false;
   }
 }

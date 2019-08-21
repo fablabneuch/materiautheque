@@ -1,7 +1,7 @@
 var fs = require('fs')
 ,http = require('http'),
 socketio = require('socket.io'),
-url = require("url"), 
+url = require("url"),
 SerialPort = require("serialport");
 
 var socketServer;
@@ -15,17 +15,17 @@ function startServer(route,handle,debug)
 	// on request event
 	function onRequest(request, response) {
 	  // parse the requested url into pathname. pathname will be compared
-	  // in route.js to handle (var content), if it matches the a page will 
-	  // come up. Otherwise a 404 will be given. 
-	  var pathname = url.parse(request.url).pathname; 
+	  // in route.js to handle (var content), if it matches the a page will
+	  // come up. Otherwise a 404 will be given.
+	  var pathname = url.parse(request.url).pathname;
 	  console.log("Request for " + pathname + " received");
 	  var content = route(handle,pathname,response,request,debug);
 	}
-	
+
 	var httpServer = http.createServer(onRequest).listen(1337, function(){
 		console.log("Listening at: http://localhost:1337");
 		console.log("Server is up");
-	}); 
+	});
 	serialListener(debug);
 	initSocketIO(httpServer,debug);
 }
@@ -48,7 +48,10 @@ function initSocketIO(httpServer,debug)
 	socket.on('sliderval', function(data) {
 		serialPort.write(data + 'P');
 	});
-	
+	socket.on('setLED', function(data) {
+		serialPort.write(data + 'O');
+	});
+
     });
 }
 
@@ -64,7 +67,7 @@ function serialListener(debug)
          stopBits: 1,
          flowControl: false
     });
- 
+
     serialPort.on("open", function () {
       console.log('open serial communication');
             // Listens to incoming data
@@ -76,8 +79,8 @@ function serialListener(debug)
          }
          // send the incoming data to browser with websockets.
        socketServer.emit('update', sendData);
-      });  
-    });  
+      });
+    });
 }
 
 exports.start = startServer;
