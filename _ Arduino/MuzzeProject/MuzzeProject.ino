@@ -16,6 +16,7 @@ boolean toggleComplete = false;  // whether the string is complete
 boolean pwmComplete = false;
 boolean setledComplete = false;
 int i;
+char *recievedValTab;
 
 void setup() {
   // initialize serial:
@@ -86,13 +87,34 @@ void loop() {
     pwmComplete = false;
   }
   if(!Serial.available() && setledComplete == true){
-    // convert String to int
-    var recievedValTab = strtok(inputString, '/');
+    // convert String to int    
+    String num_led = getValue(inputString, '-', 0);
+    String red_val = getValue(inputString, '-', 1);
+    String green_val = getValue(inputString, '-', 2);
+    String blue_val = getValue(inputString, '-', 3);
+    String brightness_val = getValue(inputString, '-', 4);
+    leds[num_led.toInt()] = CRGB(red_val.toInt(),green_val.toInt(),blue_val.toInt());
+    FastLED.setBrightness(brightness_val.toInt());
     inputString = "";
-    leds[recievedValTab[0]] = CRGB(recievedValTab[1],recievedValTab[2],recievedValTab[3]);
-    FastLED.setBrightness(constrain(recievedValTab[4]);
     pwmComplete = false;
   }
+}
+
+String getValue(String data, char separator, int index)
+{
+  int found = 0;
+  int strIndex[] = {0, -1};
+  int maxIndex = data.length()-1;
+
+  for(int i=0; i<=maxIndex && found<=index; i++){
+    if(data.charAt(i)==separator || i==maxIndex){
+        found++;
+        strIndex[0] = strIndex[1]+1;
+        strIndex[1] = (i == maxIndex) ? i+1 : i;
+    }
+  }
+
+  return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
 
 int stringToInt()

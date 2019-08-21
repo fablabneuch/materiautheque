@@ -90,7 +90,7 @@
            var green = $('#GREEN').val();
            var blue = $('#BLUE').val();
            var brightness = $('#brightness').val();
-           var setVal = num + '/' + red + '/' + green + '/' + blue + '/' + brightness + '/';
+           var setVal = num + '-' + red + '-' + green + '-' + blue + '-' + brightness + '-';
            iosocket.emit('setLED',setVal);
       });
 	});
