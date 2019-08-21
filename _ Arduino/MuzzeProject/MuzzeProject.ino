@@ -79,9 +79,6 @@ void loop() {
     // convert String to int
     int recievedVal = stringToInt();
     FastLED.setBrightness(constrain(recievedVal, MIN_BRIGHTNESS, MAX_BRIGHTNESS));
-    leds[recievedVal] = CRGB(0,255,0);
-    FastLED.show();
-    leds[recievedVal] = CRGB::Black;
     pwmComplete = false;
   }
 }
