@@ -28,22 +28,12 @@
 	#btnHolder, #sliderTxt{
 	text-align:center;
 	}
-    </style>
-        <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
-	<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
-	<script src="/socket.io/socket.io.js"></script>
-    <script>
-	// canvas request for all browsers
-	window.requestAnimFrame = (function(callback) {
-        return window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        function(callback) {
-          window.setTimeout(callback, 1000 / 30); // 30 frames per second
-	  };
-	})();
+  </style>
+      <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+      <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+      <script src="/socket.io/socket.io.js"></script>
+  <script>
+
 
 	var iosocket;
 
@@ -53,21 +43,13 @@
 	//var onOff = false;
 	var toggleVal = 0;
 
-
-
 	function initSocketIO()
 	{
 		iosocket = io.connect();
 		iosocket.on('onconnection', function(value) {
-		pollOneH = value.pollOneValue/2; // recieve start poll value from server
-		initButton();
-		initSlider();
-
-		// recieve changed values by other client from server
-		iosocket.on('updateData', function (recievedData) {
-			pollOneH = recievedData.pollOneValue/2; // recieve start poll value from server
-		});
-	    });
+  		initButton();
+  		initSlider();
+	  });
 	}
 
 	function initButton()
@@ -79,7 +61,7 @@
 	{
 	     $( "#slider" ).slider({
     	     min:0,
-    	     max:150,
+    	     max:165,
     		/*
     	     slide: function(event,ui) {
     	        iosocket.emit('sliderval',ui.value);
@@ -94,26 +76,26 @@
 
 	window.onload = function() {
 	     initSocketIO();
-        };
+  };
 
       $(document).ready(function() {
         $('#check').click(function() {
             toggleVal += 1;
-	    toggleVal %= 2;
-	    iosocket.emit('buttonval',toggleVal);
+	          toggleVal %= 2;
+	      iosocket.emit('buttonval',toggleVal);
 	 });
 	});
     </script>
   </head>
   <body>
-   
-       <div id="sData">
-	<h2>Data to Arduino</h2>
-	<div id="btnHolder">
-	  <input type="checkbox" id="check" value="toggle"/><label for="check">Toggle LED</label>
-	</div>
-	<p id="sliderTxt">LED Dimmer</p>
-	<div id="slider"></div>
+
+  <div id="sData">
+  	<h2>Data to Arduino</h2>
+  	<div id="btnHolder">
+  	  <input type="checkbox" id="check" value="toggle"/><label for="check">Toggle LED</label>
+  	</div>
+  	<p id="sliderTxt">LED Dimmer</p>
+  	<div id="slider"></div>
    </div>
   </body>
 </html>

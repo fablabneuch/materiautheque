@@ -7,11 +7,13 @@
 
 CRGB leds[NUM_LEDS];
 
+#define MAX_BRIGHTNESS 164      // Thats full on, watch the power!
+#define MIN_BRIGHTNESS 32       // set to a minimum of 25%
 
 // LED read vars
 String inputString = "";         // a string to hold incoming data
 boolean toggleComplete = false;  // whether the string is complete
-boolean pwmComplete = false;  
+boolean pwmComplete = false;
 int i;
 
 void setup() {
@@ -20,11 +22,11 @@ void setup() {
   //initialize fastLED
   FastLED.addLeds<WS2812,LED_PIN, GRB>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.show();
-  
+
 }
 
 void loop() {
-  
+
   // Recieve data from Node and write it to a String
    while (Serial.available() && toggleComplete == false && pwmComplete == false) {
     char inChar = (char)Serial.read();
@@ -35,17 +37,17 @@ void loop() {
       pwmComplete = true;
     }
     else{
-      inputString += inChar; 
+      inputString += inChar;
     }
   }
   // Toggle LED 13
   if(!Serial.available() && toggleComplete == true)
   {
-    // convert String to int. 
+    // convert String to int.
     int recievedVal = stringToInt();
-    digitalWrite(LED_DEBUG,HIGH); 
+    digitalWrite(LED_DEBUG,HIGH);
     delay(500);
-    digitalWrite(LED_DEBUG,LOW); 
+    digitalWrite(LED_DEBUG,LOW);
     if(recievedVal == 0)
     {
       for(i=0;i<24;i++){
@@ -69,23 +71,19 @@ void loop() {
       }
     //analogWrite(pwmPin,recievedVal);
       FastLED.show();
-    }    
+    }
     toggleComplete = false;
   }
   // Dim LED 3
   if(!Serial.available() && pwmComplete == true){
     // convert String to int
     int recievedVal = stringToInt();
+    FastLED.setBrightness(constrain(recievedVal, MIN_BRIGHTNESS, MAX_BRIGHTNESS));
     leds[recievedVal] = CRGB(0,255,0);
     FastLED.show();
     leds[recievedVal] = CRGB::Black;
     pwmComplete = false;
   }
-  delay(50);
-  Serial.print("B"); // begin character 
-  Serial.print(50);  
-  Serial.print("E"); // end character
-  
 }
 
 int stringToInt()
@@ -96,4 +94,3 @@ int stringToInt()
     int _recievedVal = atoi(charHolder);
     return _recievedVal;
 }
-  
