@@ -13,10 +13,15 @@ CRGB leds[NUM_LEDS];
 // LED read vars
 String inputString = "";         // a string to hold incoming data
 boolean toggleComplete = false;  // whether the string is complete
-boolean pwmComplete = false;
 boolean setledComplete = false;
 int i;
 char *recievedValTab;
+
+int num_led = 0;
+int red_val = 0;
+int green_val = 0;
+int blue_val = 0;
+int brightness_val = 0;
 
 void setup() {
   // initialize serial:
@@ -30,64 +35,46 @@ void setup() {
 void loop() {
 
   // Recieve data from Node and write it to a String
-   while (Serial.available() && toggleComplete == false && pwmComplete == false) {
+   while (Serial.available() > 0) {
     char inChar = (char)Serial.read();
-    if(inChar == 'E'){ // end character for toggle LED
-     toggleComplete = true;
-    }
-    if(inChar == 'P'){// end character for dim LED
-      pwmComplete = true;
-    }
-    if(inChar == 'O'){// end character for dim LED
-      setledComplete = true;
-    }
-    else{
-      inputString += inChar;
-    }
-  }
-  // Toggle LED 13
-  if(!Serial.available() && toggleComplete == true)
-  {
-    // convert String to int.
-    int recievedVal = stringToInt();
-    digitalWrite(LED_DEBUG,HIGH);
-    delay(500);
-    digitalWrite(LED_DEBUG,LOW);
-    if(recievedVal == 0)
-    {
-      for(i=0;i<24;i++){
-        if(i%2 == 0){
-          leds[i] = CRGB(0,255,0);
-        }else{
-          leds[i] = CRGB::Black;
+    if(toggleComplete == false && setledComplete == false){
+        if(inChar == 'A'){ // end character for toggle LED
+         toggleComplete = true;
         }
-      }
-      FastLED.show();
-      //digitalWrite(ledPin,recievedVal);
+        if(inChar == 'B'){// end character for dim LED
+          setledComplete = true;
+        }
+    }else{
+        if(toggleComplete == true){
+          if(inChar != 'X'){
+            inputString += inChar;
+          }else{
+            toggleLED();
+            toggleComplete = false;
+          }
+        }
+        if(setledComplete == true){
+          if(inChar != 'X'){
+            num_led = Serial.parseInt();
+            red_val = Serial.parseInt();
+            green_val = Serial.parseInt();
+            blue_val = Serial.parseInt();
+            brightness_val = Serial.parseInt();
+          }else{
+            leds[num_led] = CRGB(red_val,green_val,blue_val);
+            FastLED.setBrightness(brightness_val);
+            FastLED.show();
+            inputString = "";
+            setledComplete = false;
+          }
+        }
     }
-    else if(recievedVal == 1)
-    {
-      for(i=0;i<24;i++){
-        //if(i%2 != 0){
-          leds[i] = CRGB(0,255,0);
-        /*}else{
-          leds[i] = CRGB::Black;
-        }*/
-      }
-    //analogWrite(pwmPin,recievedVal);
-      FastLED.show();
-    }
-    toggleComplete = false;
   }
-  // Dim LED 3
-  if(!Serial.available() && pwmComplete == true){
+
+
+
+  /*if(!Serial.available() && setledComplete == true){
     // convert String to int
-    int recievedVal = stringToInt();
-    FastLED.setBrightness(constrain(recievedVal, MIN_BRIGHTNESS, MAX_BRIGHTNESS));
-    pwmComplete = false;
-  }
-  if(!Serial.available() && setledComplete == true){
-    // convert String to int    
     String num_led = getValue(inputString, '-', 0);
     String red_val = getValue(inputString, '-', 1);
     String green_val = getValue(inputString, '-', 2);
@@ -98,8 +85,38 @@ void loop() {
     inputString = "";
     pwmComplete = false;
   }
+  */
 }
 
+
+void toggleLED(){
+  int recievedVal = stringToInt();
+  if(recievedVal == 0)
+  {
+    for(i=0;i<24;i++){
+      if(i%2 == 0){
+        leds[i] = CRGB(0,255,0);
+      }else{
+        leds[i] = CRGB::Black;
+      }
+    }
+    FastLED.show();
+    //digitalWrite(ledPin,recievedVal);
+  }
+  else if(recievedVal == 1)
+  {
+    for(i=0;i<24;i++){
+      //if(i%2 != 0){
+        leds[i] = CRGB(0,255,0);
+      /*}else{
+        leds[i] = CRGB::Black;
+      }*/
+    }
+  //analogWrite(pwmPin,recievedVal);
+  FastLED.show();
+  }
+}
+/*
 String getValue(String data, char separator, int index)
 {
   int found = 0;
@@ -113,10 +130,8 @@ String getValue(String data, char separator, int index)
         strIndex[1] = (i == maxIndex) ? i+1 : i;
     }
   }
-
   return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
-}
-
+}*/
 int stringToInt()
 {
     char charHolder[inputString.length()+1];

@@ -43,13 +43,15 @@ function initSocketIO(httpServer,debug)
 	socket.emit('updateData',{pollOneValue:data});
 	});
 	socket.on('buttonval', function(data) {
-		serialPort.write(data + 'E');
+		serialPort.write('A' + data + 'X');
 	});
+	/*
 	socket.on('sliderval', function(data) {
-		serialPort.write(data + 'P');
+		serialPort.write('C' + data + 'X');
 	});
+	*/
 	socket.on('setLED', function(data) {
-		serialPort.write(data + 'O');
+		serialPort.write('B' + data + 'X');
 	});
 
     });
